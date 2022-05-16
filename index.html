@@ -28,33 +28,53 @@
             </select>
             <input id="star_value" class="numerical-filter form-control p-1" type="number" value="0">
         </div>
+
         <div class="d-flex flex-row p-1">
-            <h6 class="mt-2 me-1" style="width: 15em">#UI Tests</h6>
-            <select class="numerical-filter form-select p-1" id="androidTests_comparison">
+            <h6 class="mt-2 me-1">Fork</h6>
+            <select class="numerical-filter form-select p-1" id="fork_comparison">
               <option value=">="> &#62;= </option>
               <option value=">"> &#62; </option>
               <option value="="> = </option>
               <option value="<"> &#60; </option>
               <option value="<="> &#60;= </option>
             </select>
-            <input id="androidTests_value" class="numerical-filter form-control p-1" type="number" value="0">
+            <input id="fork_value" class="numerical-filter form-control p-1" type="number" value="0">
+        </div>
+
+        <div class="d-flex flex-row p-1">
+            <h6 class="mt-2 me-1" style="width: 15em">#UI Tests</h6>
+            <select class="numerical-filter form-select p-1" id="num_androidTests_comparison">
+              <option value=">="> &#62;= </option>
+              <option value=">"> &#62; </option>
+              <option value="="> = </option>
+              <option value="<"> &#60; </option>
+              <option value="<="> &#60;= </option>
+            </select>
+            <input id="num_androidTests_value" class="numerical-filter form-control p-1" type="number" value="0">
+        </div>
+        <div class="d-flex flex-row p-1">
+            <h6 class="mt-2 me-1" style="width: 15em">#Unit Tests</h6>
+            <select class="numerical-filter form-select p-1" id="num_tests_comparison">
+              <option value=">="> &#62;= </option>
+              <option value=">"> &#62; </option>
+              <option value="="> = </option>
+              <option value="<"> &#60; </option>
+              <option value="<="> &#60;= </option>
+            </select>
+            <input id="num_tests_value" class="numerical-filter form-control p-1" type="number" value="0">
+        </div>
+        <div class="d-flex flex-row p-1">
+            <h6 class="mt-2 me-1">Market</h6>
+            <select class="numerical-filter form-select p-1" id="market_value">
+              <option value="ALL"> All </option>
+              <option value="play.google.com"> Google Play </option>
+              <option value="fdroid"> F-Droid </option>
+              <option value="slideme"> SlideME </option>
+              <option value="1mobile"> 1Mobile </option>
+              <option value="PlayDrone"> PlayDrone </option>
+            </select>
         </div>
     </div>
-      <!-- <div class="form-inline" role="form">
-
-        <div class="form-group">
-          <span>Offset: </span>
-          <input name="offset" class="form-control w70" type="number" value="0">
-        </div>
-        <div class="form-group">
-          <span>Limit: </span>
-          <input name="limit" class="form-control w70" type="number" value="5">
-        </div>
-        <div class="form-group">
-          <input name="search" class="form-control" type="text" placeholder="Search">
-        </div>
-        <button id="ok" type="submit" class="btn btn-primary">OK</button>
-      </div> -->
     </div>
 
     <!-- data-show-fullscreen="true" -->
@@ -178,7 +198,7 @@
               footerFormatter: totalTextFormatter
             }, {
               title: 'Repo Detail',
-              colspan: 4,
+              colspan: 7,
               align: 'center'
             }],
             [{
@@ -188,8 +208,26 @@
               // footerFormatter: totalNameFormatter,
               align: 'center'
             }, {
-              field: 'androidTests',
+              field: 'package',
+              title: 'PackageName',
+              sortable: true,
+              // footerFormatter: totalNameFormatter,
+              align: 'center'
+            }, {
+              field: 'market',
+              title: 'Market',
+              sortable: true,
+              // footerFormatter: totalNameFormatter,
+              align: 'center'
+            }, {
+              field: 'num_androidTests',
               title: '#UI Tests',
+              sortable: true,
+              align: 'center',
+              // footerFormatter: totalPriceFormatter
+            }, {
+              field: 'num_tests',
+              title: '#Unit Tests',
               sortable: true,
               align: 'center',
               // footerFormatter: totalPriceFormatter
@@ -200,8 +238,8 @@
               align: 'center',
               // footerFormatter: totalPriceFormatter
             }, {
-              field: 'commit',
-              title: '#Commits',
+              field: 'fork',
+              title: '#Forks',
               sortable: true,
               align: 'center',
               // footerFormatter: totalPriceFormatter
@@ -230,10 +268,10 @@
           $remove.prop('disabled', true)
         })
         $('.numerical-filter').on('change',function () {
-          var star_comparison = $('#star_comparison').val()
-          var star_value = $('#star_value').val()
-          var filters = {}
-          for(let field of ['star', 'androidTests']){
+          var filters = {
+            'market': {'value': $(`#market_value`).val()}
+          }
+          for(let field of ['fork', 'star', 'num_androidTests', 'num_tests']){
             filters[field] = {
               'comparison': $(`#${field}_comparison`).val(),
               'value': $(`#${field}_value`).val()
@@ -247,16 +285,25 @@
       function customFilter(row, filters){
         let match = true;
         for (const [field, attrs] of Object.entries(filters)){
-          if (attrs['comparison'] == ">")
-            match = match && row[field] > attrs['value']
-          else if(attrs['comparison'] == ">=")
-            match = match && row[field] >= attrs['value']
-          else if(attrs['comparison'] == "=")
-            match = match && row[field] == attrs['value']
-          else if(attrs['comparison'] == "<=")
-            match = match && row[field] <= attrs['value']
+          if (field == 'market')
+          {
+              if (attrs['value'] == 'ALL')
+                continue;
+              match = match && row['market'].includes(attrs['value'])
+          }
           else
-              match = match && row[field] < attrs['value']
+          {
+            if (attrs['comparison'] == ">")
+              match = match && row[field] > attrs['value']
+            else if(attrs['comparison'] == ">=")
+              match = match && row[field] >= attrs['value']
+            else if(attrs['comparison'] == "=")
+              match = match && row[field] == attrs['value']
+            else if(attrs['comparison'] == "<=")
+              match = match && row[field] <= attrs['value']
+            else
+                match = match && row[field] < attrs['value']
+          }
         }
         return match;
       }
