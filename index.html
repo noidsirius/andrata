@@ -42,6 +42,18 @@
         </div>
 
         <div class="d-flex flex-row p-1">
+            <h6 class="mt-2 me-1">Installs</h6>
+            <select class="numerical-filter form-select p-1" id="install_comparison">
+              <option value=">="> &#62;= </option>
+              <option value=">"> &#62; </option>
+              <option value="="> = </option>
+              <option value="<"> &#60; </option>
+              <option value="<="> &#60;= </option>
+            </select>
+            <input id="install_value" class="numerical-filter form-control p-1" type="number" value="0">
+        </div>
+
+        <div class="d-flex flex-row p-1">
             <h6 class="mt-2 me-1" style="width: 15em">#UI Tests</h6>
             <select class="numerical-filter form-select p-1" id="num_androidTests_comparison">
               <option value=">="> &#62;= </option>
@@ -158,22 +170,7 @@
         }
       }
 
-      function totalTextFormatter(data) {
-        return 'Total'
-      }
 
-      function totalNameFormatter(data) {
-        return data.length
-      }
-
-      function totalPriceFormatter(data) {
-        var field = this.field
-        return '$' + data.map(function (row) {
-          return +row[field].substring(1)
-        }).reduce(function (sum, i) {
-          return sum + i
-        }, 0)
-      }
 
       function initTable() {
         $table.bootstrapTable('destroy').bootstrapTable({
@@ -194,55 +191,140 @@
               rowspan: 2,
               align: 'center',
               valign: 'middle',
+              formatter: function(item){ return `<a href="https://github.com/${item}">${item}</a>`},
               sortable: true,
-              footerFormatter: totalTextFormatter
             }, {
-              title: 'Repo Detail',
-              colspan: 7,
+              title: 'Code',
+              colspan: 3,
+              align: 'center'
+            }, {
+              title: 'Github',
+              colspan: 6,
+              align: 'center'
+            },
+            {
+              title: 'Distribution',
+              colspan: 6,
               align: 'center'
             }],
             [{
-              field: 'category',
-              title: 'Category',
-              sortable: true,
-              // footerFormatter: totalNameFormatter,
-              align: 'center'
-            }, {
-              field: 'package',
-              title: 'PackageName',
-              sortable: true,
-              // footerFormatter: totalNameFormatter,
-              align: 'center'
-            }, {
-              field: 'market',
-              title: 'Market',
-              sortable: true,
-              // footerFormatter: totalNameFormatter,
-              align: 'center'
-            }, {
               field: 'num_androidTests',
               title: '#UI Tests',
               sortable: true,
               align: 'center',
-              // footerFormatter: totalPriceFormatter
             }, {
               field: 'num_tests',
               title: '#Unit Tests',
               sortable: true,
               align: 'center',
-              // footerFormatter: totalPriceFormatter
+            }, {
+              field: 'component',
+              title: '#Components',
+              sortable: true,
+              align: 'center',
             }, {
               field: 'star',
               title: '#Stars',
               sortable: true,
+              formatter: function(item, row){
+                return item == "-1" ? "-" : item
+              },
               align: 'center',
-              // footerFormatter: totalPriceFormatter
             }, {
               field: 'fork',
               title: '#Forks',
               sortable: true,
+              formatter: function(item, row){
+                return item == "-1" ? "-" : item
+              },
               align: 'center',
-              // footerFormatter: totalPriceFormatter
+            }, {
+              field: 'pr',
+              title: '#Pull Requests',
+              sortable: true,
+              formatter: function(item, row){
+                return item == "-1" ? "-" : item
+              },
+              align: 'center',
+            }, {
+              field: 'commit',
+              title: '#Commits',
+              sortable: true,
+              align: 'center',
+            }, {
+              field: 'contributor',
+              title: '#Contributors',
+              sortable: true,
+              align: 'center',
+            }, {
+              field: 'create_date',
+              title: 'Created at',
+              sortable: true,
+              formatter: function(item){
+                a_parts = item.split(" ")
+                a_d_parts = a_parts[1].split("/")
+                new_date_a = `${a_d_parts[2]}-${a_d_parts[1]}-${a_d_parts[0]} ${a_parts[0]}`
+                return new_date_a
+              },
+              sorter: function(a, b){
+                a_parts = a.split(" ")
+                a_d_parts = a_parts[1].split("/")
+                new_date_a = `${a_d_parts[2]}-${a_d_parts[1]}-${a_d_parts[0]} ${a_parts[0]}`
+                b_parts = b.split(" ")
+                b_d_parts = b_parts[1].split("/")
+                new_date_b = `${b_d_parts[2]}-${b_d_parts[1]}-${b_d_parts[0]} ${b_parts[0]}`
+                if (new_date_a < new_date_b)
+                  return -1
+                else if (new_date_a > new_date_b)
+                  return 1
+                else
+                  return 0
+              },
+              align: 'center',
+            }, {
+              field: 'category',
+              title: 'Category',
+              sortable: true,
+              align: 'center'
+            }, {
+              field: 'package',
+              title: 'PackageName',
+              sortable: true,
+              formatter: function(item, row){
+                if (row['market'].includes('play.google.com'))
+                  return `<a href="https://play.google.com/store/apps/details?id=${item}">${item}</a>`
+                return item
+              },
+              align: 'center'
+            }, {
+              field: 'market',
+              title: 'Market',
+              sortable: true,
+              align: 'center'
+            }, {
+              field: 'install',
+              title: '#Installs',
+              sortable: true,
+              formatter: function(item, row){
+                return item == "-1" ? "-" : item
+              },
+              align: 'center'
+            }, {
+              field: 'rating',
+              title: 'Rating',
+              sortable: true,
+              formatter: function(item, row){
+                return item == "-1" ? "-" : item
+              },
+              align: 'center'
+            }, {
+              field: 'rating_ppl',
+              title: '#Rates',
+              sortable: true,
+              formatter: function(item, row){
+                return item == "-1" ? "-" : item
+              },
+              align: 'center'
             }]
           ]
         })
@@ -271,7 +353,7 @@
           var filters = {
             'market': {'value': $(`#market_value`).val()}
           }
-          for(let field of ['fork', 'star', 'num_androidTests', 'num_tests']){
+          for(let field of ['fork', 'star', 'num_androidTests', 'num_tests', 'install']){
             filters[field] = {
               'comparison': $(`#${field}_comparison`).val(),
               'value': $(`#${field}_value`).val()
@@ -311,8 +393,8 @@
 
       $(function() {
         initTable()
-
-        // $('#locale').change(initTable)
+        for(var field of ['category', 'component', 'commit', 'market', 'contributor'])
+          $table.bootstrapTable('hideColumn', field)
       })
     </script>
   </body>
