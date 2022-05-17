@@ -424,7 +424,7 @@
       }
 
       function getDate(date_value){
-        a_parts = date_value.split(" ")
+        a_parts = date_value.trim().split(" ")
         a_d_parts = a_parts[1].split("/")
         new_date_a = `${a_d_parts[2]}-${a_d_parts[1]}-${a_d_parts[0]} ${a_parts[0]}`
         return new_date_a
